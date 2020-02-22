@@ -28,6 +28,7 @@ class CreateSpotsTable extends Migration
             $table->time('opening_hour');
             $table->time('closing_hour');
             // $table->string('open_days');
+            $table->integer('owner_id');
             $table->timestamps();
         });
     }

@@ -37,7 +37,7 @@ class SpotsTableSeeder extends Seeder
                 'closing_hour' => '20:00:00',
             ),
             array(
-                'title' => 'Subilahti DIY',
+                'title' => 'Suvilahti DIY',
                 'description' => 'Skate park built by collective effort. It is one of Finlands biggest DIY skateparks.',
                 'long' => '24.973987',
                 'lat' => '60.185767',
@@ -63,6 +63,7 @@ class SpotsTableSeeder extends Seeder
                 'lat' => $dummy['lat'],
                 'opening_hour' => $dummy['opening_hour'],
                 'closing_hour' => $dummy['closing_hour'],
+                'owner_id' => '1'
             ]);
         }
     }
