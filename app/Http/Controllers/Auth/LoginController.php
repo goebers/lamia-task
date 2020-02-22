@@ -7,6 +7,7 @@ use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Exceptions\Handler;
 
 class LoginController extends Controller
 {
@@ -48,9 +49,7 @@ class LoginController extends Controller
             $user = $this->guard()->user();
             $user->generateToken();
 
-            return response()->json([
-                'data' => $user->toArray(),
-            ]);
+            return response()->json(['data' => $user->toArray()], 200);
         }
 
         return $this->sendFailedLoginResponse($request);
@@ -58,15 +57,21 @@ class LoginController extends Controller
 
     public function logout(Request $request)
     {
+        /**
+         * if request was authenticated and identified
+         * as a user in database continue to null api token
+         * and send log out success response
+         * (check routes/api.php lin 16 middleware auth:api)
+         */
         $user = Auth::guard('api')->user();
-
+        
         if ($user) {
             $user->api_token = null;
             $user->save();
-            
+
             return response()->json(['data' => 'User logged out.'], 200);
         }
 
-        return response()->json(['data' => 'User logged out.'], 200);
+        return response()->json(['error' => 'Request API token wrong or missing.'], 400);
     }
 }
