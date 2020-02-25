@@ -35,25 +35,19 @@ const initMap = () => {
 
 // populate the map with existing spots
 const populateMap = () => {
-    let spots = [];
-
     getSpots().then( spots => {
-        console.log(spots);
-
         // iterate through all spots
         spots.forEach(spot => {
             // marker variables
             const title = spot.title;
-            const desc = spot.description;
-            const long = parseFloat(spot.long);
-            const lat = parseFloat(spot.lat);
+            const spotLatLng = {
+                lat: parseFloat(spot.lat),
+                lng: parseFloat(spot.long)
+            }
 
             // create the marker
             const marker = new google.maps.Marker({
-                position: {
-                    lat: lat,
-                    lng: long
-                },
+                position: spotLatLng,
                 map: mainMap,
                 title: title
             });
@@ -68,16 +62,33 @@ const populateMap = () => {
 
 // method for opening 
 const openSpotModal = (spotData) => {
+    // modal
     const modal = document.getElementById('modal');
-    const modalContent = document.getElementById('modal-content');
-
     modal.style.display = 'block';
 
+    // modal title
     const title = document.getElementById('modal-title');
     title.textContent = spotData.title;
 
+    // modal description
     const desc = document.getElementById('modal-desc');
     desc.textContent = spotData.description;
+
+    // modal map
+    const spotLatLng = {
+        lat: parseFloat(spotData.lat),
+        lng: parseFloat(spotData.long)
+    };
+    modalMap = new google.maps.Map(
+        document.getElementById('modal-map'),
+        { zoom: 16, center: spotLatLng}
+    );
+
+    const marker = new google.maps.Marker({
+        position: spotLatLng,
+        map: modalMap,
+        title: spotData.title
+    });
 
     // add listener for closing the modal
     const closeButton = document.getElementById('close-modal')

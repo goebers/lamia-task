@@ -80,15 +80,36 @@ h6 {
     font-family: "Roboto";
 }
 
-#site-title {
+.title-bar {
     width: 100%;
     height: auto;
+    padding: 20px; 
+    display: inline-block;
     text-align: center;
+
+    img {
+        height: 30px;
+        width: auto;
+        display: inline-block;
+        margin: 0 5px;
+    }
+
+    .site-title {
+        margin: 0 5px;
+        display: inline-block;
+        height: auto;
+    }
 }
 
 #map {
     height: 500px;
     width: 60%;
+    margin: 0 auto;
+}
+
+#modal-map {
+    height: 500px;
+    width: 100%;
     margin: 0 auto;
 }
 
@@ -101,16 +122,15 @@ h6 {
     width: 100%;
     height: 100%;
     overflow: auto; 
-    background-color: rgb(0,0,0); /* Fallback color */
-    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    background-color: rgba(0,0,0,0.4);
 }
 
 #modal-content {
     background-color: #fefefe;
-    margin: 15% auto; /* 15% from the top and centered */
+    margin: 2% auto;
     padding: 20px;
     border: 1px solid #888;
-    width: 80%; /* Could be more or less, depending on screen size */
+    width: 80%; 
     position: relative;
 }
 

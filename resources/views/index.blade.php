@@ -21,8 +21,10 @@
             </div>
         </div>
 
-        <h1 id="site-title">SK8-SPOTS</h1>
-
+        <div class="title-bar">
+            <img src="{{asset('img/sk8.png')}}" alt="skateboard">
+            <h1 class="site-title">SK8-SPOTS</h1>
+        </div>
         <!-- Main view map-->
         <div id="map"></div>
         
