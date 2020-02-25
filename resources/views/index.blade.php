@@ -7,12 +7,23 @@
         <title>SK8-SPOTS</title>
 
         <!-- Fonts & CSS -->
-        <link href="https://fonts.googleapis.com/css?family=Roboto:200,600" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
         <link href="{{asset('css/app.css')}}" rel="stylesheet">
     </head>
     <body>
+        <!-- Modal -->
+        <div id="modal">
+            <div id="modal-content" class="shadow">
+                <button id="close-modal">x</button>
+                <h2 id="modal-title"></h2>
+                <p id="modal-desc"></p>
+                <div id="modal-map"></div>
+            </div>
+        </div>
+
         <h1 id="site-title">SK8-SPOTS</h1>
 
+        <!-- Main view map-->
         <div id="map"></div>
         
         <!-- JS -->
