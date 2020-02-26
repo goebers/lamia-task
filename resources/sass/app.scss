@@ -76,7 +76,9 @@ h2,
 h3,
 h4,
 h5,
-h6 {
+h6,
+p,
+span {
     font-family: "Roboto";
 }
 
@@ -101,6 +103,22 @@ h6 {
     }
 }
 
+.header-links {
+    width: 100%;
+    height: auto;
+    text-align: center;
+
+    span {
+        cursor: pointer;
+        border-right: 2px solid black;
+        padding: 0 5px;
+
+        &:last-child {
+            border: 0; 
+        }
+    }
+}
+
 #map {
     height: 500px;
     width: 60%;
@@ -113,7 +131,7 @@ h6 {
     margin: 0 auto;
 }
 
-#modal {
+#modal-wrapper {
     display: none; 
     position: fixed;
     z-index: 1;
@@ -125,7 +143,11 @@ h6 {
     background-color: rgba(0,0,0,0.4);
 }
 
-#modal-content {
+#modal-content-spot, #modal-content-register, #modal-content-login, #modal-content-about {
+    display: none;
+}
+
+.modal-content {
     background-color: #fefefe;
     margin: 2% auto;
     padding: 20px;

@@ -15,12 +15,27 @@ let modalMap;
  * run the following methods every time page is loaded
  */
 document.addEventListener('DOMContentLoaded', () => {
-    initMap();
-    populateMap();
+    initMainMap();
+    populateMainMap();
+
+    // create click listener for the login link
+    document.getElementById('login-link').addEventListener('click', () => {
+        openModal('login', null);
+    });
+    // create click listener for the register link
+    document.getElementById('register-link').addEventListener('click', () => {
+        openModal('register', null);
+    });
+    // create click listener for the about link
+    document.getElementById('about-link').addEventListener('click', () => {
+        openModal('about', null);
+    });
 });
 
-// init map method 
-const initMap = () => {
+/**
+ * init map method (for main view map)
+ */
+const initMainMap = () => {
     // The location of Helsinki city center
     const hel = { lat: 60.182, lng: 24.936 };
     
@@ -33,8 +48,10 @@ const initMap = () => {
     // const marker = new google.maps.Marker({position: hel, map: map});
 }
 
-// populate the map with existing spots
-const populateMap = () => {
+/**
+ * populate the main map with existing spots
+ */
+const populateMainMap = () => {
     getSpots().then( spots => {
         // iterate through all spots
         spots.forEach(spot => {
@@ -54,56 +71,94 @@ const populateMap = () => {
 
             // attach click listener for the marker
             google.maps.event.addListener(marker, 'click', (m) => {
-                openSpotModal(spot);
-            })
+                openModal('spot', spot);
+            });
         });
+    }).catch( error => {
+        alert('There was an error fetching existing skate spots from the backend.')
+        console.log(error);
     });
 }
 
-// method for opening 
-const openSpotModal = (spotData) => {
-    // modal
-    const modal = document.getElementById('modal');
-    modal.style.display = 'block';
+/**
+ * method for opening a specific modal
+ * @param {string} modalType 
+ * @param {*} data 
+ */
+const openModal = (modalType, data) => {
+    // set the modal display from none to block
+    const modalWrapper = document.getElementById('modal-wrapper');
+    modalWrapper.style.display = 'block';
 
-    // modal title
-    const title = document.getElementById('modal-title');
-    title.textContent = spotData.title;
+    // modal content variables
+    const spotContent = document.getElementById('modal-content-spot');
+    const loginContent = document.getElementById('modal-content-login');
+    const registerContent = document.getElementById('modal-content-register');
+    const aboutContent = document.getElementById('modal-content-about');
 
-    // modal description
-    const desc = document.getElementById('modal-desc');
-    desc.textContent = spotData.description;
+    // determine what type of content to show in modal
+    if (modalType == 'spot') {
+        // set modal-content-spot display from none to block
+        spotContent.style.display = 'block';
 
-    // modal map
-    const spotLatLng = {
-        lat: parseFloat(spotData.lat),
-        lng: parseFloat(spotData.long)
-    };
-    modalMap = new google.maps.Map(
-        document.getElementById('modal-map'),
-        { zoom: 16, center: spotLatLng}
-    );
+        // spot modal title
+        const title = document.getElementById('modal-title');
+        title.textContent = data.title;
 
-    const marker = new google.maps.Marker({
-        position: spotLatLng,
-        map: modalMap,
-        title: spotData.title
-    });
+        // spot modal description
+        const desc = document.getElementById('modal-desc');
+        desc.textContent = data.description;
 
+        // spot modal creator
+        const creator = document.getElementById('modal-creator');
+        creator.textContent = data.owner_name;
+
+        // spot modal map
+        const spotLatLng = {
+            lat: parseFloat(data.lat),
+            lng: parseFloat(data.long)
+        };
+
+        modalMap = new google.maps.Map(
+            document.getElementById('modal-map'),
+            { zoom: 16, center: spotLatLng}
+        );
+
+        const marker = new google.maps.Marker({
+            position: spotLatLng,
+            map: modalMap,
+            title: data.title
+        });
+    } else if (modalType == 'login') {
+        // set modal-content-login display from none to block
+        loginContent.style.display = 'block';
+    } else if (modalType == 'register') {
+        // set modal-content-register display from none to block
+        registerContent.style.display = 'block';
+    } else if (modalType == 'about') {
+        // set modal-content-about display from none to block
+        aboutContent.style.display = 'block';
+    }
+    
     // add listener for closing the modal
     const closeButton = document.getElementById('close-modal')
     closeButton.addEventListener('click', () => {
-        modal.style.display = 'none';
+        // set modal display to none and hide it from user view
+        modalWrapper.style.display = 'none';
 
-        // delete the modal text when modal gets closed
-        title.textContent = '';
-        desc.textContent = '';
+        // set all modal contents displays from none to block
+        spotContent.style.display = 'none';
+        loginContent.style.display = 'none';
+        registerContent.style.display = 'none';
+        aboutContent.style.display = 'none';
     });
 }
 
-// method that returns the response 
+/**
+ * get all spots method
+ * returns the fetch response as json
+ */
 const getSpots = async () => {
     const res = await fetch('/api/spots');
-
     return res.json();
 }
