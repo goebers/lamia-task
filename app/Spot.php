@@ -14,6 +14,7 @@ class Spot extends Model
         'lat',
         'opening_hour',
         'closing_hour',
-        'owner_id'
+        'owner_id',
+        'owner_name'
     ];
 }

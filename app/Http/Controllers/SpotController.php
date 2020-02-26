@@ -34,6 +34,7 @@ class SpotController extends Controller
                 'opening_hour' => $request->input('opening_hour'),
                 'closing_hour' => $request->input('closing_hour'),
                 'owner_id' => $user['id'],
+                'owner_name' => $user['name']
             ]);
 
             return response()->json(['data' => 'New spot created succesfully.'], 201);

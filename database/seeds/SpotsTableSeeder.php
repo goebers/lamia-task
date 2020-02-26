@@ -63,7 +63,8 @@ class SpotsTableSeeder extends Seeder
                 'lat' => $dummy['lat'],
                 'opening_hour' => $dummy['opening_hour'],
                 'closing_hour' => $dummy['closing_hour'],
-                'owner_id' => '1'
+                'owner_id' => '1',
+                'owner_name' => 'Administrator'
             ]);
         }
     }

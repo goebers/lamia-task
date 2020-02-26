@@ -23,12 +23,10 @@ class CreateSpotsTable extends Migration
             $table->text('description');
             $table->string('long');
             $table->string('lat');
-            // $table->integer('owner_id');
-            // $table->string('owner_name');
             $table->time('opening_hour');
             $table->time('closing_hour');
-            // $table->string('open_days');
             $table->integer('owner_id');
+            $table->string('owner_name');
             $table->timestamps();
         });
     }
