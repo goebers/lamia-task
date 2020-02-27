@@ -21,6 +21,7 @@
                 <p id="modal-desc"></p>
                 <div id="modal-map"></div>
             </div>
+
             <!-- Register modal -->
             <div id="modal-content-register" class="modal-content shadow">
                 <button class="close-modal">x</button>
@@ -29,21 +30,29 @@
                 <p id="modal-desc"></p>
                 <div id="modal-map"></div>
             </div>
+
             <!-- Login modal -->
             <div id="modal-content-login" class="modal-content shadow">
                 <button class="close-modal">x</button>
-                <h2 id="modal-title"></h2>
-                <h5 class="modal-creator">Spot creator: <span id="modal-creator"></span></h5>
-                <p id="modal-desc"></p>
-                <div id="modal-map"></div>
+                <h2 id="modal-title">Login</h2>
+                <form id="login-form">
+                    <label for="login-email">E-mail:</label>
+                    <input type="email" id="login-email-input" name="login-email" required>
+                    <br>
+                    <label for="login-password">Password:</label>
+                    <input type="password" id="login-password-input" name="login-password" required>
+                    <br>
+                    <input id="login-submit" type="submit" value="Log in">
+                </form>
             </div>
+
             <!-- About modal -->
             <div id="modal-content-about" class="modal-content shadow">
                 <button class="close-modal">x</button>
                 <h2 id="modal-title">About SK8-SPOTS</h2>
                 <p id="modal-desc">
-                    SK8-SPOTS is a web app where skaters can share their favourite skateboarding spots and mark them on a map.
-                    Everyone can browse the map for cool new spots and registered users can share new spots and give them a small description.
+                    SK8-SPOTS is a web app where skaters can share their favourite skateboarding spots and mark them on a map. <br>
+                    Everyone can browse the map for cool new spots and registered users can share new spots and give them a small description. <br>
                     Registering a user is free and if you want to edit or delete your own made spots, that is possible too.
                 </p>
             </div>

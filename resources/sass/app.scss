@@ -162,3 +162,12 @@ span {
     right: 10px;
     cursor: pointer;
 }
+
+#login-form {
+
+    label, input {
+        width: auto;
+        height: auto;
+        display: block;
+    }
+}

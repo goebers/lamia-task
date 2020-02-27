@@ -3,12 +3,26 @@
 require('./bootstrap');
 
 /**
+ * the default headers for all http requests
+ */
+const defaultHeaders = {
+    'Accept': 'application/json',
+    'Content-Type': 'application/json'
+}
+
+/**
  * google maps global variables
  * mainMap is the one that gets shown in the frontpage and contains all the spots
  * modalMap is shown in a modal and contains only one spot
  */
 let mainMap;
 let modalMap;
+
+// variable to store the api_token
+let apiToken = '';
+
+// variable to keep track if user is currently logged in
+let loggedIn = false;
 
 /**
  * window onload
@@ -30,6 +44,12 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('about-link').addEventListener('click', () => {
         openModal('about', null);
     });
+
+    // try to get the api_token from the localstorage but set it to empty string if it is null
+    apiToken = window.localStorage.getItem('api_token') || '';
+    
+    // TODO: check if token authenticates to some user
+
 });
 
 /**
@@ -133,6 +153,35 @@ const openModal = (modalType, data) => {
     } else if (modalType == 'login') {
         // set modal-content-login display from none to block
         loginContent.style.display = 'block';
+
+        // login form input variables
+        const emailInput = document.getElementById('login-email-input');
+        const passwordInput = document.getElementById('login-password-input');
+
+        // set click listener for the form submit button
+        const submitBtn = document.getElementById('login-submit');
+        submitBtn.addEventListener('click', event => {
+            // prevent the normal form submission
+            event.preventDefault();
+
+            // construct the formdata that we send to API
+            let formData = new FormData();
+            formData.append('email', emailInput.value);
+            formData.append('password', passwordInput.value);
+
+            // try to log in
+            postLogin(formData).then( response => {
+                // check if response is successfull
+                if (response.data) {
+                    apiToken = response.data.api_token;
+                    window.localStorage.setItem('api_token', response.data.api_token);
+                } else {
+                    console.log('error in logging in')
+                }
+            }).catch( error => {
+                console.log(error);
+            });
+        });
     } else if (modalType == 'register') {
         // set modal-content-register display from none to block
         registerContent.style.display = 'block';
@@ -162,6 +211,23 @@ const openModal = (modalType, data) => {
  * returns the fetch response as json
  */
 const getSpots = async () => {
-    const res = await fetch('/api/spots');
+    const res = await fetch('/api/spots', {
+        method: 'GET',
+        headers: defaultHeaders
+    });
     return res.json();
+}
+
+/**
+ * method for sending the POST request
+ * for logging in
+ * @param {FormData} formData 
+ */
+const postLogin = async (formData) => {
+    const req = await fetch('/api/login', {
+        method: 'POST',
+        headers: defaultHeaders,
+        body: JSON.stringify(Object.fromEntries(formData))
+    });
+    return req.json();
 }
