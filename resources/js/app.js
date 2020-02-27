@@ -82,6 +82,7 @@ const populateMainMap = () => {
 
 /**
  * method for opening a specific modal
+ * method also contains a click listener that closes the modal
  * @param {string} modalType 
  * @param {*} data 
  */
@@ -140,17 +141,19 @@ const openModal = (modalType, data) => {
         aboutContent.style.display = 'block';
     }
     
-    // add listener for closing the modal
-    const closeButton = document.getElementById('close-modal')
-    closeButton.addEventListener('click', () => {
-        // set modal display to none and hide it from user view
-        modalWrapper.style.display = 'none';
-
-        // set all modal contents displays from none to block
-        spotContent.style.display = 'none';
-        loginContent.style.display = 'none';
-        registerContent.style.display = 'none';
-        aboutContent.style.display = 'none';
+    // add listener for all the "closing modal"-buttons
+    const closeButtons = document.getElementsByClassName('close-modal');
+    Array.from(closeButtons).forEach( btn => {
+        btn.addEventListener('click', () => {
+            // set modal display to none and hide it from user view
+            modalWrapper.style.display = 'none';
+    
+            // set all modal contents displays from none to block
+            spotContent.style.display = 'none';
+            loginContent.style.display = 'none';
+            registerContent.style.display = 'none';
+            aboutContent.style.display = 'none';
+        });
     });
 }
 

@@ -15,7 +15,7 @@
         <div id="modal-wrapper">
             <!-- Spot modal -->
             <div id="modal-content-spot" class="modal-content shadow">
-                <button id="close-modal">x</button>
+                <button class="close-modal">x</button>
                 <h2 id="modal-title"></h2>
                 <h5 class="modal-creator">Spot creator: <span id="modal-creator"></span></h5>
                 <p id="modal-desc"></p>
@@ -23,7 +23,7 @@
             </div>
             <!-- Register modal -->
             <div id="modal-content-register" class="modal-content shadow">
-                <button id="close-modal">x</button>
+                <button class="close-modal">x</button>
                 <h2 id="modal-title"></h2>
                 <h5 class="modal-creator">Spot creator: <span id="modal-creator"></span></h5>
                 <p id="modal-desc"></p>
@@ -31,7 +31,7 @@
             </div>
             <!-- Login modal -->
             <div id="modal-content-login" class="modal-content shadow">
-                <button id="close-modal">x</button>
+                <button class="close-modal">x</button>
                 <h2 id="modal-title"></h2>
                 <h5 class="modal-creator">Spot creator: <span id="modal-creator"></span></h5>
                 <p id="modal-desc"></p>
@@ -39,7 +39,7 @@
             </div>
             <!-- About modal -->
             <div id="modal-content-about" class="modal-content shadow">
-                <button id="close-modal">x</button>
+                <button class="close-modal">x</button>
                 <h2 id="modal-title">About SK8-SPOTS</h2>
                 <p id="modal-desc">
                     SK8-SPOTS is a web app where skaters can share their favourite skateboarding spots and mark them on a map.
