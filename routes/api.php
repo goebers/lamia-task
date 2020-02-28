@@ -51,3 +51,6 @@ Route::post('login', 'Auth\LoginController@login');
 
 // logout
 Route::post('logout', 'Auth\LoginController@logout');
+
+// is api_token valid
+Route::get('valid', 'Auth\LoginController@isValidUser');

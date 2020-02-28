@@ -41,6 +41,25 @@ class LoginController extends Controller
         $this->middleware('guest')->except('logout');
     }
 
+    /**
+     * this method checks if the authorization token
+     * in request corresponds to user is found in database
+     */
+    public function isValidUser(Request $request)
+    {
+        $user = Auth::guard('api')->user();
+
+        // check if auth header corresponds to user and return user info
+        if ($user) {
+            return response()->json(['data' => $user->toArray()], 200);
+        }
+
+        return response()->json(['error' => 'Sent user token could not be matched to any user in database.'], 403);
+    }
+
+    /**
+     * this method is for login
+     */
     public function login(Request $request)
     {
         $this->validateLogin($request);
@@ -55,6 +74,9 @@ class LoginController extends Controller
         return $this->sendFailedLoginResponse($request);
     }
 
+    /**
+     * method for logging out the user based on the authorizationa header
+     */
     public function logout(Request $request)
     {
         /**
@@ -72,6 +94,6 @@ class LoginController extends Controller
             return response()->json(['data' => 'User logged out.'], 200);
         }
 
-        return response()->json(['error' => 'Request API token wrong or missing.'], 400);
+        return response()->json(['error' => 'Request API token wrong or missing.'], 403);
     }
 }
