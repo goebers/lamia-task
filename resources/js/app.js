@@ -2,6 +2,8 @@
 
 require('./bootstrap');
 
+// store the user info
+let userName = '';
 /**
  * the default headers for all http requests
  */
@@ -24,27 +26,8 @@ let apiToken = '';
 // variable to keep track if user is currently logged in
 let loggedIn = false;
 
-/**
- * window onload
- * run the following methods every time page is loaded
- */
-document.addEventListener('DOMContentLoaded', () => {
-    initMainMap();
-    populateMainMap();
-
-    // create click listener for the login link
-    document.getElementById('login-link').addEventListener('click', () => {
-        openModal('login', null);
-    });
-    // create click listener for the register link
-    document.getElementById('register-link').addEventListener('click', () => {
-        openModal('register', null);
-    });
-    // create click listener for the about link
-    document.getElementById('about-link').addEventListener('click', () => {
-        openModal('about', null);
-    });
-
+window.addEventListener('load', () => {
+    console.log('load')
     // try to get the api_token from the localstorage but set it to empty string if it is null
     apiToken = localStorage.getItem('api_token') || '';
     
@@ -53,16 +36,76 @@ document.addEventListener('DOMContentLoaded', () => {
         // check response to see if api_token matched
         if (response.data) {
             loggedIn = true;
+            // render the title links based on the loggedIn boolean
+            changeHeaderStyles(loggedIn);
+            userName = response.data.name || '';
+            
+            const userNameElement = document.getElementById('user-name-span');
+            userNameElement.innerHTML = userName;
         } else {
             loggedIn = false;
             localStorage.removeItem('api_token');
             apiToken = '';
+            userName = '';
+            // render the title links based on the loggedIn boolean
+            changeHeaderStyles(loggedIn);
         }
 
         console.log('loggedin: '+ loggedIn);
     }).catch( error => {
         console.log(error);
     });
+
+    // render the title links based on the loggedIn boolean
+    changeHeaderStyles(loggedIn);
+
+});
+
+/**
+ * window onload
+ * run the following methods every time page is loaded
+ */
+window.addEventListener('DOMContentLoaded', () => {
+    initMainMap();
+    populateMainMap();
+
+    // create click listener for the login link
+    document.getElementById('login-link').addEventListener('click', () => {
+        openModal('login', null);
+    });
+
+    // create click listener for the register link
+    document.getElementById('register-link').addEventListener('click', () => {
+        openModal('register', null);
+    });
+
+    // create click listener for the about link
+    document.getElementById('about-link').addEventListener('click', () => {
+        openModal('about', null);
+    });
+
+    // create click listener for the about link
+    document.getElementById('logout-link').addEventListener('click', () => {
+        postLogOut().then( response => {    
+            console.log(response);
+            apiToken = '';
+            changeHeaderStyles();
+        }).catch( error => {
+            console.log('error in logging out from server');
+        });
+
+        apiToken = '';
+
+        loggedIn = false;
+        changeHeaderStyles(loggedIn);
+
+        // clear username
+        userName = '';
+
+        document.getElementById('user-name-span').value = userName;
+        
+    });
+
 });
 
 /**
@@ -83,7 +126,7 @@ const initMainMap = () => {
  * populate the main map with existing spots
  */
 const populateMainMap = () => {
-    getSpots().then( spots => {
+    getAllSpots().then( spots => {
         // iterate through all spots
         spots.forEach(spot => {
             // marker variables
@@ -127,6 +170,7 @@ const openModal = (modalType, data) => {
     const loginContent = document.getElementById('modal-content-login');
     const registerContent = document.getElementById('modal-content-register');
     const aboutContent = document.getElementById('modal-content-about');
+    // const createSpotContent = document.getElementById('modal-content-create');
 
     // determine what type of content to show in modal
     if (modalType == 'spot') {
@@ -186,8 +230,22 @@ const openModal = (modalType, data) => {
                 if (response.data) {
                     apiToken = response.data.api_token;
                     localStorage.setItem('api_token', response.data.api_token);
+                    
+                    loggedIn = true;
+                    changeHeaderStyles(loggedIn);
+
+                    closeModal();
+
+                    emailInput.value = '';
+                    passwordInput.value = '';
+                    
+                    // store new user name
+                    userName = response.data.name;
+
+                    const userNameElement = document.getElementById('user-name-span');
+                    userNameElement.innerHTML = userName;
                 } else {
-                    console.log('error in logging in')
+                    console.log('error in logging in');
                 }
             }).catch( error => {
                 console.log(error);
@@ -196,6 +254,18 @@ const openModal = (modalType, data) => {
     } else if (modalType == 'register') {
         // set modal-content-register display from none to block
         registerContent.style.display = 'block';
+
+        // register form input variables
+        const nameInput = document.getElementById('register-name-input');
+        const emailInput = document.getElementById('register-email-input');
+        const passwordInput = document.getElementById('register-password-input');
+        const passwordInput2 = document.getElementById('register-password-2-input');
+
+        // set click listener for the form submit button
+        const submitBtn = document.getElementById('register-submit');
+        submitBtn.addEventListener('click', event => {
+            event.preventDefault();
+        })
     } else if (modalType == 'about') {
         // set modal-content-about display from none to block
         aboutContent.style.display = 'block';
@@ -205,16 +275,44 @@ const openModal = (modalType, data) => {
     const closeButtons = document.getElementsByClassName('close-modal');
     Array.from(closeButtons).forEach( btn => {
         btn.addEventListener('click', () => {
-            // set modal display to none and hide it from user view
-            modalWrapper.style.display = 'none';
-    
-            // set all modal contents displays from none to block
-            spotContent.style.display = 'none';
-            loginContent.style.display = 'none';
-            registerContent.style.display = 'none';
-            aboutContent.style.display = 'none';
+            closeModal();
         });
     });
+}
+
+const closeModal = () => {
+    // set modal display to none and hide it from user view
+    const modalWrapper = document.getElementById('modal-wrapper');
+    modalWrapper.style.display = 'none';
+
+    // set all modal contents displays from none to block
+    spotContent.style.display = 'none';
+    loginContent.style.display = 'none';
+    registerContent.style.display = 'none';
+    aboutContent.style.display = 'none';
+}
+
+/**
+ * change the header links styles based on the loggedIn boolean
+ * loggedIn == true REGISTER | LOGIN | ABOUT
+ * loggedIn == false CREATE SPOT | LOGOUT | ABOUT
+ * @param {boolean} loggedIn
+ */
+const changeHeaderStyles = (loggedIn) => {
+    const loggedInFalseDiv = document.getElementById('logged-in-false');
+    const loggedInTrueDiv = document.getElementById('logged-in-true');
+    const userNameElement = document.getElementById('user-name-title');
+
+    if (loggedIn == true) {
+        loggedInFalseDiv.style.display = 'none';
+        loggedInTrueDiv.style.display = 'inline';
+        userNameElement.style.display = 'block';
+        
+    } else if (loggedIn == false) {
+        loggedInFalseDiv.style.display = 'inline';
+        loggedInTrueDiv.style.display = 'none';
+        userNameElement.style.display = 'none';
+    }
 }
 
 /**
@@ -236,10 +334,10 @@ const validateUser = async (apiToken) => {
 }
 
 /**
- * get all spots method
- * returns the fetch response as json
+ * GET method for getting all spots
+ * returns the fetch promise
  */
-const getSpots = async () => {
+const getAllSpots = async () => {
     const req = await fetch('/api/spots', {
         method: 'GET',
         headers: defaultHeaders
@@ -249,8 +347,22 @@ const getSpots = async () => {
 }
 
 /**
+ * POST method for creating a new user
+ * returns the fetch promise
+ * @param {FormData} formData 
+ */
+const postRegister = async (formData) => {
+    const req = await fetch('/api/register', {
+        method: 'POST',
+        headers: defaultHeaders,
+        body: JSON.stringify(Object.fromEntries(formData))
+    });
+    return req.json();
+}
+
+/**
  * POST method for logging in
- * returns the fetch response as json
+ * returns the fetch promise
  * @param {FormData} formData 
  */
 const postLogin = async (formData) => {
@@ -259,5 +371,23 @@ const postLogin = async (formData) => {
         headers: defaultHeaders,
         body: JSON.stringify(Object.fromEntries(formData))
     });
+    
+    return req.json();
+}
+
+/**
+ * POST method for loggin out user
+ * and clearing the localstorage api_token
+ * @param {FormData} formData
+ */
+const postLogOut = async () => {
+    const fetchHeaders = defaultHeaders;
+    fetchHeaders.Authorization= 'Bearer ' + apiToken;
+
+    const req = await fetch('api/logout', {
+        method: 'POST',
+        headers: fetchHeaders
+    });
+    
     return req.json();
 }

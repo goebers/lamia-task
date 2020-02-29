@@ -25,10 +25,21 @@
             <!-- Register modal -->
             <div id="modal-content-register" class="modal-content shadow">
                 <button class="close-modal">x</button>
-                <h2 id="modal-title"></h2>
-                <h5 class="modal-creator">Spot creator: <span id="modal-creator"></span></h5>
-                <p id="modal-desc"></p>
-                <div id="modal-map"></div>
+                <form id="register-form">
+                    <label for="register-name">Name:</label>
+                    <input type="text" id="register-name-input" name="register-name" required>
+                    <br>
+                    <label for="register-email">E-mail:</label>
+                    <input type="email" id="register-email-input" name="register-email" required>
+                    <br>
+                    <label for="register-password">Password:</label>
+                    <input type="password" id="register-password-input" name="register-password" required>
+                    <br>
+                    <label for="register-password-2">Confirm password:</label>
+                    <input type="password" id="register-password-2-input" name="register-password-2" required>
+                    <br>
+                    <input id="register-submit" type="submit" value="Register">
+                </form>
             </div>
 
             <!-- Login modal -->
@@ -58,15 +69,25 @@
             </div>
         </div>
 
+        <!-- Title -->
         <div class="title-bar">
             <img src="{{asset('img/sk8.png')}}" alt="skateboard">
             <h1 class="site-title">SK8-SPOTS</h1>
+
+            <h6 id="user-name-title">Welcome: <span id="user-name-span"></span></h6>
         </div>
 
         <!-- Login/register/about -->
         <div class="header-links">
-            <span id="register-link">REGISTER</span>
-            <span id="login-link">LOGIN</span>
+            <div id="logged-in-false">
+                <span id="register-link">REGISTER</span>
+                <span id="login-link">LOGIN</span>
+            </div>
+            <div id="logged-in-true">
+                <span id="create-link">CREATE SPOT</span>
+                <span id="logout-link">LOGOUT</span>
+            </div>
+
             <span id="about-link">ABOUT</span>
         </div>
         <!-- Main view map-->
