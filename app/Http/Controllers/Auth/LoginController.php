@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Exceptions\Handler;
+use App\User;
 
 class LoginController extends Controller
 {
@@ -43,18 +44,26 @@ class LoginController extends Controller
 
     /**
      * this method checks if the authorization token
-     * in request corresponds to user is found in database
+     * in request corresponds to a api_token found in users database
      */
     public function isValidUser(Request $request)
     {
-        $user = Auth::guard('api')->user();
+        // get the bearer token from response
+        $requestToken = $request->bearerToken();
 
-        // check if auth header corresponds to user and return user info
-        if ($user) {
+        /**
+         * try to find a matching api_token from user DB
+         * (returns nothing/null if not found)
+         */
+        $tokenMatch = User::where('api_token', '=', $requestToken)->exists();
+        
+        if ($tokenMatch) {
+            // if a matching api_token is found send back user info
+            $user = Auth::guard('api')->user();
             return response()->json(['data' => $user->toArray()], 200);
         }
 
-        return response()->json(['error' => 'Sent user token could not be matched to any user in database.'], 403);
+        return response()->json(['error' => 'Sent user token could not be matched to any user in database.'], 200);
     }
 
     /**

@@ -46,10 +46,23 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // try to get the api_token from the localstorage but set it to empty string if it is null
-    apiToken = window.localStorage.getItem('api_token') || '';
+    apiToken = localStorage.getItem('api_token') || '';
     
-    // TODO: check if token authenticates to some user
+    // check if api token authenticates to some user
+    validateUser(apiToken).then( response => {
+        // check response to see if api_token matched
+        if (response.data) {
+            loggedIn = true;
+        } else {
+            loggedIn = false;
+            localStorage.removeItem('api_token');
+            apiToken = '';
+        }
 
+        console.log('loggedin: '+ loggedIn);
+    }).catch( error => {
+        console.log(error);
+    });
 });
 
 /**
@@ -64,8 +77,6 @@ const initMainMap = () => {
         document.getElementById('map'),
         { zoom: 11, center: hel }
     );
-
-    // const marker = new google.maps.Marker({position: hel, map: map});
 }
 
 /**
@@ -174,7 +185,7 @@ const openModal = (modalType, data) => {
                 // check if response is successfull
                 if (response.data) {
                     apiToken = response.data.api_token;
-                    window.localStorage.setItem('api_token', response.data.api_token);
+                    localStorage.setItem('api_token', response.data.api_token);
                 } else {
                     console.log('error in logging in')
                 }
@@ -207,20 +218,39 @@ const openModal = (modalType, data) => {
 }
 
 /**
+ * method for validating the api token to a existing user
+ * returns the fetch response as json
+ * @param {string} apiToken 
+ */
+const validateUser = async (apiToken) => {
+    // add the authorization header on top of default headers
+    const fetchHeaders = defaultHeaders;
+    fetchHeaders['Authorization'] = 'Bearer ' + apiToken;
+    
+    const req = await fetch('/api/valid', {
+        method: 'GET',
+        headers: fetchHeaders
+    });
+
+    return req.json();
+}
+
+/**
  * get all spots method
  * returns the fetch response as json
  */
 const getSpots = async () => {
-    const res = await fetch('/api/spots', {
+    const req = await fetch('/api/spots', {
         method: 'GET',
         headers: defaultHeaders
     });
-    return res.json();
+    
+    return req.json();
 }
 
 /**
- * method for sending the POST request
- * for logging in
+ * POST method for logging in
+ * returns the fetch response as json
  * @param {FormData} formData 
  */
 const postLogin = async (formData) => {
