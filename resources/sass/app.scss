@@ -122,17 +122,13 @@ span {
     }
 }
 
-#map {
-    height: 500px;
-    width: 60%;
-    margin: 0 auto;
-}
-
-#modal-map {
+#map , #modal-map, #modal-create-map {
     height: 500px;
     width: 100%;
     margin: 0 auto;
 }
+
+
 
 #modal-wrapper {
     display: none; 
@@ -146,7 +142,7 @@ span {
     background-color: rgba(0,0,0,0.4);
 }
 
-#modal-content-spot, #modal-content-register, #modal-content-login, #modal-content-about {
+#modal-content-spot, #modal-content-register, #modal-content-login, #modal-content-about, #modal-content-create {
     display: none;
 }
 
@@ -166,16 +162,7 @@ span {
     cursor: pointer;
 }
 
-#register-form {
-
-    label, input {
-        width: auto;
-        height: auto;
-        display: block;
-    }
-}
-
-#login-form {
+#register-form, #login-form, #create-spot-form{
 
     label, input {
         width: auto;

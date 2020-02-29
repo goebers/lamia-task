@@ -20,6 +20,11 @@ const defaultHeaders = {
 let mainMap;
 let modalMap;
 
+// The location of Helsinki city center
+const hel = {
+    lat: 60.182, lng: 24.936
+}
+
 // variable to store the api_token
 let apiToken = '';
 
@@ -27,19 +32,18 @@ let apiToken = '';
 let loggedIn = false;
 
 window.addEventListener('load', () => {
-    console.log('load')
     // try to get the api_token from the localstorage but set it to empty string if it is null
     apiToken = localStorage.getItem('api_token') || '';
-    
+
     // check if api token authenticates to some user
-    validateUser(apiToken).then( response => {
+    validateUser(apiToken).then(response => {
         // check response to see if api_token matched
         if (response.data) {
             loggedIn = true;
             // render the title links based on the loggedIn boolean
             changeHeaderStyles(loggedIn);
             userName = response.data.name || '';
-            
+
             const userNameElement = document.getElementById('user-name-span');
             userNameElement.innerHTML = userName;
         } else {
@@ -50,9 +54,7 @@ window.addEventListener('load', () => {
             // render the title links based on the loggedIn boolean
             changeHeaderStyles(loggedIn);
         }
-
-        console.log('loggedin: '+ loggedIn);
-    }).catch( error => {
+    }).catch(error => {
         console.log(error);
     });
 
@@ -86,11 +88,11 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // create click listener for the about link
     document.getElementById('logout-link').addEventListener('click', () => {
-        postLogOut().then( response => {    
+        postLogOut().then(response => {
             console.log(response);
             apiToken = '';
             changeHeaderStyles();
-        }).catch( error => {
+        }).catch(error => {
             console.log('error in logging out from server');
         });
 
@@ -103,7 +105,6 @@ window.addEventListener('DOMContentLoaded', () => {
         userName = '';
 
         document.getElementById('user-name-span').value = userName;
-        
     });
 
     document.getElementById('create-link').addEventListener('click', () => {
@@ -116,9 +117,6 @@ window.addEventListener('DOMContentLoaded', () => {
  * init map method (for main view map)
  */
 const initMainMap = () => {
-    // The location of Helsinki city center
-    const hel = { lat: 60.182, lng: 24.936 };
-    
     // The map, centered at Helsinki
     mainMap = new google.maps.Map(
         document.getElementById('map'),
@@ -130,7 +128,7 @@ const initMainMap = () => {
  * populate the main map with existing spots
  */
 const populateMainMap = () => {
-    getAllSpots().then( spots => {
+    getAllSpots().then(spots => {
         // iterate through all spots
         spots.forEach(spot => {
             // marker variables
@@ -152,7 +150,7 @@ const populateMainMap = () => {
                 openModal('spot', spot);
             });
         });
-    }).catch( error => {
+    }).catch(error => {
         alert('There was an error fetching existing skate spots from the backend.')
         console.log(error);
     });
@@ -201,7 +199,7 @@ const openModal = (modalType, data) => {
 
         modalMap = new google.maps.Map(
             document.getElementById('modal-map'),
-            { zoom: 16, center: spotLatLng}
+            { zoom: 16, center: spotLatLng }
         );
 
         const marker = new google.maps.Marker({
@@ -229,12 +227,12 @@ const openModal = (modalType, data) => {
             formData.append('password', passwordInput.value);
 
             // try to log in
-            postLogin(formData).then( response => {
+            postLogin(formData).then(response => {
                 // check if response is successfull
                 if (response.data) {
                     apiToken = response.data.api_token;
                     localStorage.setItem('api_token', response.data.api_token);
-                    
+
                     loggedIn = true;
                     changeHeaderStyles(loggedIn);
 
@@ -242,7 +240,7 @@ const openModal = (modalType, data) => {
 
                     emailInput.value = '';
                     passwordInput.value = '';
-                    
+
                     // store new user name
                     userName = response.data.name;
 
@@ -251,7 +249,7 @@ const openModal = (modalType, data) => {
                 } else {
                     console.log('error in logging in');
                 }
-            }).catch( error => {
+            }).catch(error => {
                 console.log(error);
             });
         });
@@ -268,22 +266,114 @@ const openModal = (modalType, data) => {
         // set click listener for the form submit button
         const submitBtn = document.getElementById('register-submit');
         submitBtn.addEventListener('click', event => {
+            let formData = new FormData();
+            formData.append('name', nameInput.value);
+            formData.append('email', emailInput.value);
+            formData.append('password', passwordInput.value);
+            formData.append('password_confirmation', passwordInput2.value);
+
+            postRegister(formData).then(response => {
+                console.log(response);
+                if (response.data) {
+                    apiToken = response.data.api_token;
+                    localStorage.setItem('api_token', response.data.api_token);
+
+                    loggedIn = true;
+                    changeHeaderStyles(loggedIn);
+
+                    closeModal();
+
+                    nameInput.value = '';
+                    emailInput.value = '';
+                    passwordInput.value = '';
+                    passwordInput2.value = '';
+
+                    // store new user name
+                    userName = response.data.name;
+
+                    const userNameElement = document.getElementById('user-name-span');
+                    userNameElement.innerHTML = userName;
+                } else {
+                    console.log(data.errors);
+                }
+            }).catch(error => {
+                console.log(error);
+            });
+
             event.preventDefault();
         });
     } else if (modalType == 'about') {
         // set modal-content-about display from none to block
         aboutContent.style.display = 'block';
     } else if (modalType = 'create') {
-        createSpotContentstyle.display = 'block';
+        createSpotContent.style.display = 'block';
+
+        // marker
+        let marker;
+
+        modalMap = new google.maps.Map(
+            document.getElementById('modal-create-map'),
+            { zoom: 11, center: hel }
+        );
+
+        modalMap.addListener('click', event => {
+            // check if marker exists
+            if (marker) {
+                marker.setMap(null);
+            }
+
+            marker = new google.maps.Marker({
+                position: event.latLng,
+                map: modalMap
+            });
+            
+        });
+
+        // set click listener for the form submit button
+        const submitBtn = document.getElementById('create-submit');
+        submitBtn.addEventListener('click', event => {
+            const titleInput = document.getElementById('create-title-input');
+            const descriptionInput = document.getElementById('create-description-input');
+            const openingHrInput = document.getElementById('create-opening-hour-input');
+            const closingHrInput = document.getElementById('create-closing-hour-input');
+
+            let formData = new FormData();
+            formData.append('title', titleInput.value);
+            formData.append('description', descriptionInput.value);
+            formData.append('opening_hour', openingHrInput.value);
+            formData.append('closing_hour', closingHrInput.value);
+            formData.append('long', marker.getPosition().lng());
+            formData.append('lat', marker.getPosition().lat());
+
+            postSpot(formData).then(response => {
+                if (response.data) {
+                    populateMainMap();
+                    closeModal();
+
+                    titleInput.value = '';
+                    descriptionInput.value = '';
+                    openingHrInput.value = '';
+                    closingHrInput.value = '';
+                } else {
+                    console.log(data.errors);
+                }
+            }).catch(error => {
+                console.log(error);
+            });
+
+            event.preventDefault();
+
+        });
     }
-    
+
     // add listener for all the "closing modal"-buttons
     const closeButtons = document.getElementsByClassName('close-modal');
-    Array.from(closeButtons).forEach( btn => {
+    Array.from(closeButtons).forEach(btn => {
         btn.addEventListener('click', () => {
             closeModal();
         });
     });
+    
 }
 
 const closeModal = () => {
@@ -291,11 +381,20 @@ const closeModal = () => {
     const modalWrapper = document.getElementById('modal-wrapper');
     modalWrapper.style.display = 'none';
 
+    // modal content variables
+    const spotContent = document.getElementById('modal-content-spot');
+    const loginContent = document.getElementById('modal-content-login');
+    const registerContent = document.getElementById('modal-content-register');
+    const aboutContent = document.getElementById('modal-content-about');
+    const createSpotContent = document.getElementById('modal-content-create');
+
+
     // set all modal contents displays from none to block
     spotContent.style.display = 'none';
     loginContent.style.display = 'none';
     registerContent.style.display = 'none';
     aboutContent.style.display = 'none';
+    createSpotContent.style.display = 'none';
 }
 
 /**
@@ -313,7 +412,7 @@ const changeHeaderStyles = (loggedIn) => {
         loggedInFalseDiv.style.display = 'none';
         loggedInTrueDiv.style.display = 'inline';
         userNameElement.style.display = 'block';
-        
+
     } else if (loggedIn == false) {
         loggedInFalseDiv.style.display = 'inline';
         loggedInTrueDiv.style.display = 'none';
@@ -329,8 +428,8 @@ const changeHeaderStyles = (loggedIn) => {
 const validateUser = async (apiToken) => {
     // add the authorization header on top of default headers
     const fetchHeaders = defaultHeaders;
-    fetchHeaders['Authorization'] = 'Bearer ' + apiToken;
-    
+    fetchHeaders.Authorization = 'Bearer ' + apiToken;
+
     const req = await fetch('/api/valid', {
         method: 'GET',
         headers: fetchHeaders
@@ -348,7 +447,24 @@ const getAllSpots = async () => {
         method: 'GET',
         headers: defaultHeaders
     });
-    
+
+    return req.json();
+}
+
+/**
+ * POST method for creating a new spot
+ * returns the fetch promise
+ * @param {FormData} formData 
+ */
+const postSpot = async (formData) => {
+    const fetchHeaders = defaultHeaders;
+    fetchHeaders.Authorization = 'Bearer ' + apiToken;
+
+    const req = await fetch('/api/spots', {
+        method: 'POST',
+        headers: fetchHeaders,
+        body: JSON.stringify(Object.fromEntries(formData))
+    });
     return req.json();
 }
 
@@ -377,7 +493,7 @@ const postLogin = async (formData) => {
         headers: defaultHeaders,
         body: JSON.stringify(Object.fromEntries(formData))
     });
-    
+
     return req.json();
 }
 
@@ -387,13 +503,14 @@ const postLogin = async (formData) => {
  * @param {FormData} formData
  */
 const postLogOut = async () => {
+    // add the authorization header on top of default headers
     const fetchHeaders = defaultHeaders;
-    fetchHeaders.Authorization= 'Bearer ' + apiToken;
+    fetchHeaders.Authorization = 'Bearer ' + apiToken;
 
     const req = await fetch('api/logout', {
         method: 'POST',
         headers: fetchHeaders
     });
-    
+
     return req.json();
 }

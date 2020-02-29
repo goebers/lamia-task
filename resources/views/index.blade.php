@@ -25,6 +25,7 @@
             <!-- Register modal -->
             <div id="modal-content-register" class="modal-content shadow">
                 <button class="close-modal">x</button>
+                <h2 id="modal-title">Register a new user</h2>
                 <form id="register-form">
                     <label for="register-name">Name:</label>
                     <input type="text" id="register-name-input" name="register-name" required>
@@ -39,6 +40,29 @@
                     <input type="password" id="register-password-2-input" name="register-password-2" required>
                     <br>
                     <input id="register-submit" type="submit" value="Register">
+                </form>
+            </div>
+
+            <!-- Create new spot modal -->
+            <div id="modal-content-create" class="modal-content shadow">
+                <button class="close-modal">x</button>
+                <h2 id="modal-title">Create a new spot</h2>
+                <form id="create-spot-form">
+                    <label for="create-title">Title:</label>
+                    <input type="text" id="create-title-input" name="create-title" required>
+                    <br>
+                    <label for="create-description">Description:</label>
+                    <input type="text" id="create-description-input" name="create-description" required>
+                    <br>
+                    <label for="create-opening-hour">Opening Hour:</label>
+                    <input type="time" id="create-opening-hour-input" name="create-opening-hour" min="00:00" max="24:00" required>
+                    <br>
+                    <label for="create-closing-hour">Closing Hour:</label>
+                    <input type="time" id="create-closing-hour-input" name="create-closing-hour" min="00:00" max="24:00" required>
+                    <br>
+                    <div id="modal-create-map"></div>
+                    <br>
+                    <input id="create-submit" type="submit" value="Register">
                 </form>
             </div>
 
