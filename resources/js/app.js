@@ -106,6 +106,10 @@ window.addEventListener('DOMContentLoaded', () => {
         
     });
 
+    document.getElementById('create-link').addEventListener('click', () => {
+        openModal('create', null);
+    });
+
 });
 
 /**
@@ -170,7 +174,7 @@ const openModal = (modalType, data) => {
     const loginContent = document.getElementById('modal-content-login');
     const registerContent = document.getElementById('modal-content-register');
     const aboutContent = document.getElementById('modal-content-about');
-    // const createSpotContent = document.getElementById('modal-content-create');
+    const createSpotContent = document.getElementById('modal-content-create');
 
     // determine what type of content to show in modal
     if (modalType == 'spot') {
@@ -265,10 +269,12 @@ const openModal = (modalType, data) => {
         const submitBtn = document.getElementById('register-submit');
         submitBtn.addEventListener('click', event => {
             event.preventDefault();
-        })
+        });
     } else if (modalType == 'about') {
         // set modal-content-about display from none to block
         aboutContent.style.display = 'block';
+    } else if (modalType = 'create') {
+        createSpotContentstyle.display = 'block';
     }
     
     // add listener for all the "closing modal"-buttons
