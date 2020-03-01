@@ -197,8 +197,19 @@ const openModal = (modalType, data) => {
         desc.textContent = data.description;
 
         // spot modal creator
+        const creatorWrapper = document.getElementById('modal-creator-wrapper');
         const creator = document.getElementById('modal-creator');
         creator.textContent = data.owner_name;
+
+        // spot modal opening hour
+        const openingHrWrapper = document.getElementById('modal-opening-hr-wrapper');
+        const openingHr = document.getElementById('modal-opening-hr');
+        openingHr.textContent = data.opening_hour;
+
+        // spot modal closing hour
+        const closingHrWrapper = document.getElementById('modal-closing-hr-wrapper');
+        const closingHr = document.getElementById('modal-closing-hr');
+        closingHr.textContent = data.closing_hour;
 
         // spot modal map
         const spotLatLng = {
@@ -231,6 +242,146 @@ const openModal = (modalType, data) => {
 
                     editDeleteBtnsDiv.style.display = 'block';
 
+                    /**
+                     * get references to multiple buttons, divs & labels
+                     * that are needed for editing & deleting spot
+                     */
+                    const titleEditInput = document.getElementById('title-edit');
+                    const descriptionEditInput = document.getElementById('desc-edit');
+                    const openingHrInput = document.getElementById('opening-hr-edit');
+                    const closingHrInput = document.getElementById('closing-hr-edit');
+                    
+                    const modalEditTitle = document.getElementById('modal-edit-title');
+                    const modalEditTitleLabel = document.getElementById('title-edit-label');
+                    const modalEditOpeningHrLabel = document.getElementById('opening-hr-edit-label');
+                    const modalEditClosingHrLabel = document.getElementById('closing-hr-edit-label');
+                    const modalEditDescLabel = document.getElementById('desc-edit-label');
+                    const modalEditMapLabel = document.getElementById('modal-map-edit-label');
+                    
+                    const editBtnsDiv = document.getElementById('edit-btns');
+                    const submitBtn = document.getElementById('submit-edit-button');
+                    const cancelbtn = document.getElementById('cancel-button');
+
+                    // edit marker position
+                    let editMarker = marker;
+
+                    // set edit button click listener
+                    editBtn.addEventListener('click', () => {
+                        // set input values to existing ones
+                        titleEditInput.value = data.title;
+                        descriptionEditInput.value = data.description;
+                        openingHrInput.value = data.opening_hour;
+                        closingHrInput.value = data.closing_hour;
+
+                        // set edit spot modal styles accordingly
+                        titleEditInput.style.display = 'block';
+                        descriptionEditInput.style.display = 'block';
+                        openingHrInput.style.display = 'block';
+                        closingHrInput.style.display = 'block';
+                        modalEditTitle.style.display = 'block';
+                        modalEditTitleLabel.style.display = 'block';
+                        modalEditOpeningHrLabel.style.display = 'block';
+                        modalEditClosingHrLabel.style.display = 'block';
+                        modalEditDescLabel.style.display = 'block';
+                        modalEditMapLabel.style.display = 'block';
+                        editDeleteBtnsDiv.style.display = 'none';
+
+                        // show buttons suitable for edit mode
+                        editBtnsDiv.style.display = 'block';
+
+                        // hide all normal modal elements
+                        title.style.display = 'none';
+                        desc.style.display = 'none';
+                        creatorWrapper.style.display = 'none';
+                        openingHrWrapper.style.display = 'none';
+                        closingHrWrapper.style.display = 'none';
+
+                        // add click listener to the modal map so that it can be edited
+                        modalMap.addListener('click', event => {
+                            // check if marker exists
+                            if (editMarker) {
+                                editMarker.setMap(null);
+                            }
+
+                            editMarker = new google.maps.Marker({
+                                position: event.latLng,
+                                map: modalMap
+                            });
+                        });
+                    });
+
+                    // submit edit button click listener
+                    submitBtn.addEventListener('click', () => {
+                        // create formdata object
+                        let formData = new FormData();
+                        formData.append('title', titleEditInput.value);
+                        formData.append('description', descriptionEditInput.value);
+                        formData.append('long', editMarker.getPosition().lng());
+                        formData.append('lat', editMarker.getPosition().lat());
+                        formData.append('opening_hour', openingHrInput.value);
+                        formData.append('closing_hour', closingHrInput.value);
+
+                        // try to send the formdata and spot id
+                        editSpot(formData, data.id).then( response => {
+                            if (response.data) {
+                                editBtnsDiv.style.display = 'none';
+                                openingHrInput.style.display = 'none';
+                                closingHrInput.style.display = 'none';
+                                populateMainMap();
+                                closeModal();
+
+                                // just reverse the stuff that editBtn click does
+                                titleEditInput.style.display = 'none';
+                                descriptionEditInput.style.display = 'none';
+                                editDeleteBtnsDiv.style.display = 'block';
+                                editBtnsDiv.style.display = 'none';
+                                openingHrInput.style.display = 'none';
+                                closingHrInput.style.display = 'none';
+                                modalEditTitle.style.display = 'none';
+                                modalEditTitleLabel.style.display = 'none';
+                                modalEditOpeningHrLabel.style.display = 'none';
+                                modalEditClosingHrLabel.style.display = 'none';
+                                modalEditDescLabel.style.display = 'none';
+                                modalEditMapLabel.style.display = 'none';
+
+                                // show again all the normal modal elements
+                                title.style.display = 'block';
+                                desc.style.display = 'block';
+                                creatorWrapper.style.display = 'block';
+                                openingHrWrapper.style.display = 'block';
+                                closingHrWrapper.style.display = 'block';
+                            } else {
+                                alert('There was a problem trying to edit the spot!');
+                            }
+                        }).catch( error => {
+                            console.log(error);
+                        })
+                    });
+
+                    // cancel edit button click listener
+                    cancelbtn.addEventListener('click', () => {
+                        // just reverse the stuff that editBtn click does
+                        titleEditInput.style.display = 'none';
+                        descriptionEditInput.style.display = 'none';
+                        editDeleteBtnsDiv.style.display = 'block';
+                        editBtnsDiv.style.display = 'none';
+                        openingHrInput.style.display = 'none';
+                        closingHrInput.style.display = 'none';
+                        modalEditTitle.style.display = 'none';
+                        modalEditTitleLabel.style.display = 'none';
+                        modalEditOpeningHrLabel.style.display = 'none';
+                        modalEditClosingHrLabel.style.display = 'none';
+                        modalEditDescLabel.style.display = 'none';
+                        modalEditMapLabel.style.display = 'none';
+
+                        // show again all the normal modal elements
+                        title.style.display = 'block';
+                        desc.style.display = 'block';
+                        creatorWrapper.style.display = 'block';
+                        openingHrWrapper.style.display = 'block';
+                        closingHrWrapper.style.display = 'block';
+                    });
+
                     // set delete button click listener
                     deleteBtn.addEventListener('click', () => {
                         if (window.confirm('Are you sure you want to delete this spot?')) {
@@ -241,7 +392,7 @@ const openModal = (modalType, data) => {
                                 }
                             }).catch( error => {
                                 console.log(error);
-                            })
+                            });
                         }
                     });
                 }
@@ -369,7 +520,6 @@ const openModal = (modalType, data) => {
                 position: event.latLng,
                 map: modalMap
             });
-            
         });
 
         // set click listener for the form submit button
@@ -515,6 +665,25 @@ const postSpot = async (formData) => {
 }
 
 /**
+ * PUT method for updating a spot based on spot id
+ * returns the fetch promise
+ * @param {FormData} formData 
+ * @param {Number} spotId 
+ */
+const editSpot = async (formData, spotId) => {
+    const fetchHeaders = defaultHeaders;
+    fetchHeaders["Content-Type"] = 'application/x-www-form-urlencoded' // we need to do this specifically for the PUT method
+    fetchHeaders.Authorization = 'Bearer ' + apiToken;
+
+    const req = await fetch('/api/spots/' + spotId, {
+        method: 'PUT',
+        headers: fetchHeaders,
+        body: new URLSearchParams(formData).toString()
+    });
+    return req.json();
+}
+
+/**
  * DELETE method for removing a spot based on spot id
  * returns the fetch promise
  * @param {Number} spotId 
@@ -525,7 +694,7 @@ const deleteSpot = async (spotId) => {
 
     const req = await fetch('/api/spots/' + spotId, {
         method: 'DELETE',
-        headers: fetchHeaders
+        headers: fetchHeaders,
     });
     return req.json();
 }

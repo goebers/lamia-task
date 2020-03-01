@@ -17,13 +17,32 @@
             <div id="modal-content-spot" class="modal-content shadow">
                 <button class="close-modal">x</button>
                 <h2 id="modal-title"></h2>
-                <h5 class="modal-creator">Spot creator: <span id="modal-creator"></span></h5>
+                <h2 id="modal-edit-title">Edit the spot</h2>
+                <label id="title-edit-label" for="title-edit">Title:</label>
+                <input type="text" name="title-edit" id="title-edit">
+                <h5 id="modal-creator-wrapper">Spot creator: <span id="modal-creator"></span></h5>
+                <h6 id="modal-opening-hr-wrapper">Opening hour: <span id="modal-opening-hr"></span></h6>
+                <label id="opening-hr-edit-label" for="opening-hr-edit">Opening hour:</label>
+                <input type="time" name="opening-hr-edit" id="opening-hr-edit" min="00:00" max="24:00">
+                <h6 id="modal-closing-hr-wrapper">Closing hour: <span id="modal-closing-hr"></span></h6>
+                <label id="closing-hr-edit-label" for="closing-hr-edit">Closing hour:</label>
+                <input type="time" name="closing-hr-edit" id="closing-hr-edit" min="00:00" max="24:00">
                 <p id="modal-desc"></p>
+                <label id="desc-edit-label" for="desc-edit">Description:</label>
+                <textarea cols="30" rows="5" name="desc-edit" id="desc-edit"></textarea>
+                <label id="modal-map-edit-label" for="modal-map">Edit marker position:</label>
                 <div id="modal-map"></div>
 
+                <!-- edit/delete spot buttons -->
                 <div id="delete-edit-btns">
                     <button id="edit-button">Edit spot</button>
                     <button id="delete-button">Delete spot</button>
+                </div>
+
+                <!-- edit spot buttons -->
+                <div id="edit-btns">
+                    <button id="submit-edit-button">Submit edit</button>
+                    <button id="cancel-button">Cancel</button>
                 </div>
             </div>
 
@@ -57,7 +76,7 @@
                     <input type="text" id="create-title-input" name="create-title" required>
                     <br>
                     <label for="create-description">Description:</label>
-                    <input type="text" id="create-description-input" name="create-description" required>
+                    <textarea cols="30" rows="5" id="create-description-input" name="create-description" required></textarea>
                     <br>
                     <label for="create-opening-hour">Opening Hour:</label>
                     <input type="time" id="create-opening-hour-input" name="create-opening-hour" min="00:00" max="24:00" required>

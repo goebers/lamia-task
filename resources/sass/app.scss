@@ -142,8 +142,16 @@ span {
     background-color: rgba(0,0,0,0.4);
 }
 
-#modal-content-spot, #modal-content-register, #modal-content-login, #modal-content-about, #modal-content-create, #delete-edit-btns {
+#modal-content-spot, #modal-content-register, #modal-content-login,
+#modal-content-about, #modal-content-create, #delete-edit-btns,
+#edit-btns, #modal-edit-title {
     display: none;
+}
+
+#modal-content-spot {
+    input, textarea, label {
+        display: none;
+    }
 }
 
 .modal-content {
