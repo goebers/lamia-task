@@ -58,10 +58,10 @@
                     <input type="email" id="register-email-input" name="register-email" required>
                     <br>
                     <label for="register-password">Password:</label>
-                    <input type="password" id="register-password-input" name="register-password" required>
+                    <input type="password" id="register-password-input" name="register-password" minlength="8" required>
                     <br>
                     <label for="register-password-2">Confirm password:</label>
-                    <input type="password" id="register-password-2-input" name="register-password-2" required>
+                    <input type="password" id="register-password-2-input" name="register-password-2" minlength="8" required>
                     <br>
                     <input id="register-submit" type="submit" value="Register">
                 </form>
@@ -84,6 +84,7 @@
                     <label for="create-closing-hour">Closing Hour:</label>
                     <input type="time" id="create-closing-hour-input" name="create-closing-hour" min="00:00" max="24:00" required>
                     <br>
+                    <label for="modal-create-map">Place a marker for your spot by clicking on the map:</label>
                     <div id="modal-create-map"></div>
                     <br>
                     <input id="create-submit" type="submit" value="Create spot">

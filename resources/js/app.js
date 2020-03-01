@@ -20,6 +20,7 @@ const defaultHeaders = {
 let mainMap;
 let mainMapMarkers = [];
 let modalMap;
+let modalMapMarker;
 
 // The location of Helsinki city center
 const hel = {
@@ -211,6 +212,9 @@ const openModal = (modalType, data) => {
         const closingHr = document.getElementById('modal-closing-hr');
         closingHr.textContent = data.closing_hour;
 
+        // the id of the current spot
+        const currentSpotId = data.id;
+
         // spot modal map
         const spotLatLng = {
             lat: parseFloat(data.lat),
@@ -222,7 +226,7 @@ const openModal = (modalType, data) => {
             { zoom: 16, center: spotLatLng }
         );
 
-        const marker = new google.maps.Marker({
+        modalMapMarker = new google.maps.Marker({
             position: spotLatLng,
             map: modalMap,
             title: data.title
@@ -263,7 +267,7 @@ const openModal = (modalType, data) => {
                     const cancelbtn = document.getElementById('cancel-button');
 
                     // edit marker position
-                    let editMarker = marker;
+                    let editMarker = modalMapMarker;
 
                     // set edit button click listener
                     editBtn.addEventListener('click', () => {
@@ -322,7 +326,7 @@ const openModal = (modalType, data) => {
                         formData.append('closing_hour', closingHrInput.value);
 
                         // try to send the formdata and spot id
-                        editSpot(formData, data.id).then( response => {
+                        editSpot(formData, currentSpotId).then( response => {
                             if (response.data) {
                                 editBtnsDiv.style.display = 'none';
                                 openingHrInput.style.display = 'none';
@@ -385,7 +389,7 @@ const openModal = (modalType, data) => {
                     // set delete button click listener
                     deleteBtn.addEventListener('click', () => {
                         if (window.confirm('Are you sure you want to delete this spot?')) {
-                            deleteSpot(data.id).then( response => {
+                            deleteSpot(currentSpotId).then( response => {
                                 if (response.data) {
                                     populateMainMap();
                                     closeModal();
@@ -409,9 +413,9 @@ const openModal = (modalType, data) => {
         const emailInput = document.getElementById('login-email-input');
         const passwordInput = document.getElementById('login-password-input');
 
-        // set click listener for the form submit button
-        const submitBtn = document.getElementById('login-submit');
-        submitBtn.addEventListener('click', event => {
+        // set submit listener for the login form
+        const loginForm = document.getElementById('login-form');
+        loginForm.addEventListener('submit', event => {
             // prevent the normal form submission
             event.preventDefault();
 
@@ -441,7 +445,7 @@ const openModal = (modalType, data) => {
                     const userNameElement = document.getElementById('user-name-span');
                     userNameElement.innerHTML = userName;
                 } else {
-                    console.log('error in logging in');
+                    alert('Logging in was unsuccessfull. Please check your credentials. If the problem persists please notify the admin.');
                 }
             }).catch(error => {
                 console.log(error);
@@ -457,53 +461,55 @@ const openModal = (modalType, data) => {
         const passwordInput = document.getElementById('register-password-input');
         const passwordInput2 = document.getElementById('register-password-2-input');
 
-        // set click listener for the form submit button
-        const submitBtn = document.getElementById('register-submit');
-        submitBtn.addEventListener('click', event => {
-            let formData = new FormData();
-            formData.append('name', nameInput.value);
-            formData.append('email', emailInput.value);
-            formData.append('password', passwordInput.value);
-            formData.append('password_confirmation', passwordInput2.value);
-
-            postRegister(formData).then(response => {
-                console.log(response);
-                if (response.data) {
-                    apiToken = response.data.api_token;
-                    localStorage.setItem('api_token', response.data.api_token);
-
-                    loggedIn = true;
-                    changeHeaderStyles(loggedIn);
-
-                    closeModal();
-
-                    nameInput.value = '';
-                    emailInput.value = '';
-                    passwordInput.value = '';
-                    passwordInput2.value = '';
-
-                    // store new user name
-                    userName = response.data.name;
-
-                    const userNameElement = document.getElementById('user-name-span');
-                    userNameElement.innerHTML = userName;
-                } else {
-                    console.log(data.errors);
-                }
-            }).catch(error => {
-                console.log(error);
-            });
-
+        // set submit listener for the register form
+        const registerForm = document.getElementById('register-form');
+        registerForm.addEventListener('submit', event => {
+            // prevent default form function
             event.preventDefault();
+
+            // if register form validation is successfull
+            if (formValidation('register')) {
+                let formData = new FormData();
+                formData.append('name', nameInput.value);
+                formData.append('email', emailInput.value);
+                formData.append('password', passwordInput.value);
+                formData.append('password_confirmation', passwordInput2.value);
+
+                postRegister(formData).then(response => {
+                    if (response.data) {
+                        apiToken = response.data.api_token;
+                        localStorage.setItem('api_token', response.data.api_token);
+
+                        loggedIn = true;
+                        changeHeaderStyles(loggedIn);
+
+                        closeModal();
+
+                        nameInput.value = '';
+                        emailInput.value = '';
+                        passwordInput.value = '';
+                        passwordInput2.value = '';
+
+                        // store new user name
+                        userName = response.data.name;
+
+                        const userNameElement = document.getElementById('user-name-span');
+                        userNameElement.innerHTML = userName;
+                    } else {
+                        console.log(data.errors);
+                    }
+                }).catch(error => {
+                    console.log(error);
+                });
+            } else {
+                alert('Your passwords do not match! Please type both passwords the same.');
+            }
         });
     } else if (modalType == 'about') {
         // set modal-content-about display from none to block
         aboutContent.style.display = 'block';
     } else if (modalType = 'create') {
         createSpotContent.style.display = 'block';
-
-        // marker
-        let marker;
 
         modalMap = new google.maps.Map(
             document.getElementById('modal-create-map'),
@@ -512,50 +518,57 @@ const openModal = (modalType, data) => {
 
         modalMap.addListener('click', event => {
             // check if marker exists
-            if (marker) {
-                marker.setMap(null);
+            if (modalMapMarker) {
+                modalMapMarker.setMap(null);
             }
 
-            marker = new google.maps.Marker({
+            modalMapMarker = new google.maps.Marker({
                 position: event.latLng,
                 map: modalMap
             });
         });
 
-        // set click listener for the form submit button
-        const submitBtn = document.getElementById('create-submit');
-        submitBtn.addEventListener('click', event => {
-            const titleInput = document.getElementById('create-title-input');
-            const descriptionInput = document.getElementById('create-description-input');
-            const openingHrInput = document.getElementById('create-opening-hour-input');
-            const closingHrInput = document.getElementById('create-closing-hour-input');
-
-            let formData = new FormData();
-            formData.append('title', titleInput.value);
-            formData.append('description', descriptionInput.value);
-            formData.append('opening_hour', openingHrInput.value);
-            formData.append('closing_hour', closingHrInput.value);
-            formData.append('long', marker.getPosition().lng());
-            formData.append('lat', marker.getPosition().lat());
-
-            postSpot(formData).then(response => {
-                if (response.data) {
-                    populateMainMap();
-                    closeModal();
-
-                    titleInput.value = '';
-                    descriptionInput.value = '';
-                    openingHrInput.value = '';
-                    closingHrInput.value = '';
-                } else {
-                    console.log(data.errors);
-                }
-            }).catch(error => {
-                console.log(error);
-            });
-
+        // set submit listener for the create spot form
+        const createForm = document.getElementById('create-spot-form');
+        createForm.addEventListener('submit', event => {
+            // prevent normal form submitting
             event.preventDefault();
 
+            // if create spot form validation is successfull
+            if (formValidation('create')) {
+                // form input variables
+                const titleInput = document.getElementById('create-title-input');
+                const descriptionInput = document.getElementById('create-description-input');
+                const openingHrInput = document.getElementById('create-opening-hour-input');
+                const closingHrInput = document.getElementById('create-closing-hour-input');
+
+                // formdata variables
+                let formData = new FormData();
+                formData.append('title', titleInput.value);
+                formData.append('description', descriptionInput.value);
+                formData.append('opening_hour', openingHrInput.value);
+                formData.append('closing_hour', closingHrInput.value);
+                formData.append('long', modalMapMarker.getPosition().lng());
+                formData.append('lat', modalMapMarker.getPosition().lat());
+
+                postSpot(formData).then(response => {
+                    if (response.data) {
+                        populateMainMap();
+                        closeModal();
+
+                        titleInput.value = '';
+                        descriptionInput.value = '';
+                        openingHrInput.value = '';
+                        closingHrInput.value = '';
+                    } else {
+                        console.log(data.errors);
+                    }
+                }).catch(error => {
+                    console.log(error);
+                });
+            } else {
+                alert('Please fill all the inputs! Make sure you have placed a marker on the map!');
+            }
         });
     }
 
@@ -591,6 +604,31 @@ const closeModal = () => {
     aboutContent.style.display = 'none';
     createSpotContent.style.display = 'none';
     editDeleteBtnsDiv.style.display = 'none';
+}
+
+/**
+ * method that checks if the given form is validated
+ * returns true if form is valid and false if form is not valid
+ * @param {string} formString 
+ */
+const formValidation = (formString) => {
+    if (formString == 'register') {
+        const pwd1 = document.getElementById('register-password-input').value;
+        const pwd2 = document.getElementById('register-password-2-input').value;
+
+        if (pwd1 == pwd2) {
+            return true;
+        } else {
+            return false;
+        }
+    } else if ('create') {
+        // check if marker is set
+        if (modalMapMarker !== undefined) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
 
 /**
