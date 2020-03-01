@@ -8,7 +8,7 @@
 
         <!-- Fonts & CSS -->
         <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
-        <link href="{{secure_asset('css/app.css')}}" rel="stylesheet">
+        <link href="{{asset('css/app.css')}}" rel="stylesheet">
     </head>
     <body>
         <!-- Modal wrapper -->
@@ -119,7 +119,7 @@
 
         <!-- Title -->
         <div class="title-bar">
-            <img src="{{secure_asset('img/sk8.png')}}" alt="skateboard">
+            <img src="{{asset('img/sk8.png')}}" alt="skateboard">
             <h1 class="site-title">SK8-SPOTS</h1>
 
             <h6 id="user-name-title">Welcome: <span id="user-name-span"></span></h6>
@@ -142,7 +142,7 @@
         <div id="map"></div>
         
         <!-- JS -->
-        <script src="{{secure_asset('js/app.js')}}"></script>
+        <script src="{{asset('js/app.js')}}"></script>
         <script src="https://maps.googleapis.com/maps/api/js?key={{env('GMAPS_KEY')}}"></script>
     </body>
 </html>
