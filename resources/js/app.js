@@ -18,6 +18,7 @@ const defaultHeaders = {
  * modalMap is shown in a modal and contains only one spot
  */
 let mainMap;
+let mainMapMarkers = [];
 let modalMap;
 
 // The location of Helsinki city center
@@ -128,6 +129,12 @@ const initMainMap = () => {
  * populate the main map with existing spots
  */
 const populateMainMap = () => {
+    // reset all markers
+    mainMapMarkers.forEach( marker => {
+        marker.setMap(null);
+    })
+
+    // get all spots from backend and construct markers
     getAllSpots().then(spots => {
         // iterate through all spots
         spots.forEach(spot => {
@@ -144,6 +151,8 @@ const populateMainMap = () => {
                 map: mainMap,
                 title: title
             });
+
+            mainMapMarkers.push(marker);
 
             // attach click listener for the marker
             google.maps.event.addListener(marker, 'click', (m) => {
@@ -207,6 +216,40 @@ const openModal = (modalType, data) => {
             map: modalMap,
             title: data.title
         });
+
+        // check if the spot is made by user that might be logged in
+        validateUser(apiToken).then( response => {
+            if (response.data) {
+                // if the spot owner_id and logged in users id match make elements visible
+                if (response.data.id == data.owner_id) {
+                    creator.textContent = 'You!';
+
+                    // edit/delete buttons variables
+                    const editDeleteBtnsDiv = document.getElementById('delete-edit-btns');
+                    const editBtn = document.getElementById('edit-button');
+                    const deleteBtn = document.getElementById('delete-button');
+
+                    editDeleteBtnsDiv.style.display = 'block';
+
+                    // set delete button click listener
+                    deleteBtn.addEventListener('click', () => {
+                        if (window.confirm('Are you sure you want to delete this spot?')) {
+                            deleteSpot(data.id).then( response => {
+                                if (response.data) {
+                                    populateMainMap();
+                                    closeModal();
+                                }
+                            }).catch( error => {
+                                console.log(error);
+                            })
+                        }
+                    });
+                }
+            }
+        }).catch( error => {
+            console.log(error);
+        });
+
     } else if (modalType == 'login') {
         // set modal-content-login display from none to block
         loginContent.style.display = 'block';
@@ -373,7 +416,6 @@ const openModal = (modalType, data) => {
             closeModal();
         });
     });
-    
 }
 
 const closeModal = () => {
@@ -388,6 +430,9 @@ const closeModal = () => {
     const aboutContent = document.getElementById('modal-content-about');
     const createSpotContent = document.getElementById('modal-content-create');
 
+    // add spot edit/delete buttons here also
+    const editDeleteBtnsDiv = document.getElementById('delete-edit-btns');
+
 
     // set all modal contents displays from none to block
     spotContent.style.display = 'none';
@@ -395,6 +440,7 @@ const closeModal = () => {
     registerContent.style.display = 'none';
     aboutContent.style.display = 'none';
     createSpotContent.style.display = 'none';
+    editDeleteBtnsDiv.style.display = 'none';
 }
 
 /**
@@ -464,6 +510,22 @@ const postSpot = async (formData) => {
         method: 'POST',
         headers: fetchHeaders,
         body: JSON.stringify(Object.fromEntries(formData))
+    });
+    return req.json();
+}
+
+/**
+ * DELETE method for removing a spot based on spot id
+ * returns the fetch promise
+ * @param {Number} spotId 
+ */
+const deleteSpot = async (spotId) => {
+    const fetchHeaders = defaultHeaders;
+    fetchHeaders.Authorization = 'Bearer ' + apiToken;
+
+    const req = await fetch('/api/spots/' + spotId, {
+        method: 'DELETE',
+        headers: fetchHeaders
     });
     return req.json();
 }

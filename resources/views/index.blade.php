@@ -20,6 +20,11 @@
                 <h5 class="modal-creator">Spot creator: <span id="modal-creator"></span></h5>
                 <p id="modal-desc"></p>
                 <div id="modal-map"></div>
+
+                <div id="delete-edit-btns">
+                    <button id="edit-button">Edit spot</button>
+                    <button id="delete-button">Delete spot</button>
+                </div>
             </div>
 
             <!-- Register modal -->
@@ -62,7 +67,7 @@
                     <br>
                     <div id="modal-create-map"></div>
                     <br>
-                    <input id="create-submit" type="submit" value="Register">
+                    <input id="create-submit" type="submit" value="Create spot">
                 </form>
             </div>
 
