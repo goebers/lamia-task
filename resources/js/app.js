@@ -646,7 +646,7 @@ const closeModal = () => {
     // this stuff makes sure edit window always gets hidden when exited
     titleEditInput.style.display = 'none';
     descriptionEditInput.style.display = 'none';
-    editDeleteBtnsDiv.style.display = 'block';
+    editDeleteBtnsDiv.style.display = 'none';
     editDeleteBtnsDiv.style['align-self'] = 'fles-end';
     editBtnsDiv.style.display = 'none';
     openingHrInput.style.display = 'none';
