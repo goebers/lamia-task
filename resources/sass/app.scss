@@ -71,6 +71,10 @@ select {
 
 /* ----- beginning of custom css ----- */
 
+// mobile and desktop breakpoints
+$break-small: 390px;
+$break-large: 1200px;
+
 h1,
 h2,
 h3,
@@ -90,7 +94,7 @@ span {
     text-align: center;
 
     img {
-        height: 30px;
+        height: 100px;
         width: auto;
         display: inline-block;
         margin: 0 5px;
@@ -100,13 +104,22 @@ span {
         margin: 0 5px;
         display: inline-block;
         height: auto;
+        font-family: "Lacquer";
+        text-shadow: -4px 4px 0 #ec556f;
     }
 }
 
-.header-links {
+#header-links {
     width: 100%;
     height: auto;
     text-align: center;
+    font-family: "Roboto";
+    display: block;
+    visibility: hidden;
+
+    @media screen and (max-width: $break-small) {
+        padding: 10px;
+    }
 
     div {
         display: none;
@@ -115,6 +128,7 @@ span {
             border-right: 2px solid black;
             padding: 0 5px;
         }
+        
     }
 
     span {
@@ -122,10 +136,30 @@ span {
     }
 }
 
-#map , #modal-map, #modal-create-map {
-    height: 500px;
+#map-wrapper {
+    margin: 1% auto;
+    padding: 20px;
+    width: 80%;
+    height: 80vh;
+
+    @media screen and (max-width: $break-large) {
+        margin: 0;
+        margin-top: 10px;
+        padding: 0;
+        width: 100%;
+    }
+}
+
+#map, #modal-map, #modal-create-map {
+    height: 100%;
     width: 100%;
     margin: 0 auto;
+
+    @media screen and (max-width: $break-large) {
+        height: 100vh;
+        width: 100%;
+        margin: 0px;
+    }
 }
 
 
@@ -162,6 +196,20 @@ span {
     width: 80%; 
     position: relative;
 }
+#modal-content-login, #modal-content-about, #modal-content-register {
+    height: 60%;
+    width: 40vh;
+    font-family: 'Roboto';
+
+    @media screen and (max-width: $break-large) {
+        width: 60vh;
+    }
+
+    @media screen and (max-width: $break-small) {
+        width: 80vh;
+    }
+
+}
 
 .close-modal {
     position: absolute;
@@ -170,9 +218,9 @@ span {
     cursor: pointer;
 }
 
-#register-form, #login-form, #create-spot-form{
+#register-form, #login-form, #create-spot-form, #modal-text-wrapper {
 
-    label, input {
+    label {
         width: auto;
         height: auto;
         display: block;
@@ -180,5 +228,58 @@ span {
 }
 
 #user-name-title {
-    display: none;
+    visibility: hidden;
+    width: 100%;
+    text-align: center;
+}
+
+.row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    width: 100%;
+
+    @media screen and (max-width: $break-small) {
+        display: block !important;
+    }
+}
+
+.column-1 {
+    display: flex;
+    flex-direction: column;
+    width: 50vh;
+
+    @media screen and (max-width: $break-large) {
+        display: flex;
+        width: 100%;
+        flex-direction: row;
+    }
+}
+
+.column-2 {
+    display: flex;
+    flex-direction: column;
+    width: 100vh;
+
+    @media screen and (max-width: $break-large) {
+        display: flex;
+        width: 100%;
+        flex-direction: row;
+    }
+}
+
+.content {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+    height: 100%;
+}
+  
+.content .upper {
+    justify-content: normal;
+}
+
+#modal-map-edit-label {
+    display: block !important;
+    visibility: hidden;
 }

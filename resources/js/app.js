@@ -33,6 +33,37 @@ let apiToken = '';
 // variable to keep track if user is currently logged in
 let loggedIn = false;
 
+/**
+ * get references to multiple buttons, divs & labels
+ * that are needed for editing & deleting spot
+ * these need to be global so that we can always hide the edit window from user 
+ */
+// spot mdoal edit
+const titleEditInput = document.getElementById('title-edit');
+const descriptionEditInput = document.getElementById('desc-edit');
+const openingHrInput = document.getElementById('opening-hr-edit');
+const closingHrInput = document.getElementById('closing-hr-edit');
+
+// spot modal edit labels
+const modalEditTitle = document.getElementById('modal-edit-title');
+const modalEditTitleLabel = document.getElementById('title-edit-label');
+const modalEditOpeningHrLabel = document.getElementById('opening-hr-edit-label');
+const modalEditClosingHrLabel = document.getElementById('closing-hr-edit-label');
+const modalEditDescLabel = document.getElementById('desc-edit-label');
+const modalEditMapLabel = document.getElementById('modal-map-edit-label');
+
+// spot modal edit buttons & wrapper
+const editBtnsDiv = document.getElementById('edit-btns');
+const submitBtn = document.getElementById('submit-edit-button');
+const cancelbtn = document.getElementById('cancel-button');
+
+// spot modal variables
+const title = document.getElementById('modal-title');
+const desc = document.getElementById('modal-desc');
+const creatorWrapper = document.getElementById('modal-creator-wrapper');
+const openingHrWrapper = document.getElementById('modal-opening-hr-wrapper');
+const closingHrWrapper = document.getElementById('modal-closing-hr-wrapper');
+
 window.addEventListener('load', () => {
     // try to get the api_token from the localstorage but set it to empty string if it is null
     apiToken = localStorage.getItem('api_token') || '';
@@ -46,8 +77,15 @@ window.addEventListener('load', () => {
             changeHeaderStyles(loggedIn);
             userName = response.data.name || '';
 
+            // show the username
             const userNameElement = document.getElementById('user-name-span');
             userNameElement.innerHTML = userName;
+            const userNameTitleElement = document.getElementById('user-name-title');
+            userNameTitleElement.style.visibility = 'visible';
+
+            // set the header links after window is loaded
+            const headerLinks = document.getElementById('header-links');
+            headerLinks.style.visibility = 'visible';
         } else {
             loggedIn = false;
             localStorage.removeItem('api_token');
@@ -55,14 +93,14 @@ window.addEventListener('load', () => {
             userName = '';
             // render the title links based on the loggedIn boolean
             changeHeaderStyles(loggedIn);
+
+            // set the header links after window is loaded
+            const headerLinks = document.getElementById('header-links');
+            headerLinks.style.visibility = 'visible';
         }
     }).catch(error => {
         console.log(error);
     });
-
-    // render the title links based on the loggedIn boolean
-    changeHeaderStyles(loggedIn);
-
 });
 
 /**
@@ -122,7 +160,16 @@ const initMainMap = () => {
     // The map, centered at Helsinki
     mainMap = new google.maps.Map(
         document.getElementById('map'),
-        { zoom: 11, center: hel }
+        { 
+            zoom: 11, 
+            center: hel,
+            mapTypeId: 'roadmap',
+            streetViewControl: false,
+            rotateControl: false,
+            fullscreenControl: false,
+            zoomControl: true,
+            mapTypeControl: false,
+        }
     );
 }
 
@@ -175,7 +222,7 @@ const populateMainMap = () => {
 const openModal = (modalType, data) => {
     // set the modal display from none to block
     const modalWrapper = document.getElementById('modal-wrapper');
-    modalWrapper.style.display = 'block';
+    modalWrapper.style.display = 'flex';
 
     // modal content variables
     const spotContent = document.getElementById('modal-content-spot');
@@ -187,28 +234,23 @@ const openModal = (modalType, data) => {
     // determine what type of content to show in modal
     if (modalType == 'spot') {
         // set modal-content-spot display from none to block
-        spotContent.style.display = 'block';
+        spotContent.style.display = 'flex';
 
         // spot modal title
-        const title = document.getElementById('modal-title');
         title.textContent = data.title;
 
         // spot modal description
-        const desc = document.getElementById('modal-desc');
         desc.textContent = data.description;
 
         // spot modal creator
-        const creatorWrapper = document.getElementById('modal-creator-wrapper');
         const creator = document.getElementById('modal-creator');
         creator.textContent = data.owner_name;
 
         // spot modal opening hour
-        const openingHrWrapper = document.getElementById('modal-opening-hr-wrapper');
         const openingHr = document.getElementById('modal-opening-hr');
         openingHr.textContent = data.opening_hour;
 
         // spot modal closing hour
-        const closingHrWrapper = document.getElementById('modal-closing-hr-wrapper');
         const closingHr = document.getElementById('modal-closing-hr');
         closingHr.textContent = data.closing_hour;
 
@@ -223,7 +265,15 @@ const openModal = (modalType, data) => {
 
         modalMap = new google.maps.Map(
             document.getElementById('modal-map'),
-            { zoom: 16, center: spotLatLng }
+            {
+                zoom: 16,
+                center: spotLatLng,
+                streetViewControl: false,
+                rotateControl: false,
+                fullscreenControl: false,
+                zoomControl: true,
+                mapTypeControl: false,
+            }
         );
 
         modalMapMarker = new google.maps.Marker({
@@ -246,26 +296,6 @@ const openModal = (modalType, data) => {
 
                     editDeleteBtnsDiv.style.display = 'block';
 
-                    /**
-                     * get references to multiple buttons, divs & labels
-                     * that are needed for editing & deleting spot
-                     */
-                    const titleEditInput = document.getElementById('title-edit');
-                    const descriptionEditInput = document.getElementById('desc-edit');
-                    const openingHrInput = document.getElementById('opening-hr-edit');
-                    const closingHrInput = document.getElementById('closing-hr-edit');
-                    
-                    const modalEditTitle = document.getElementById('modal-edit-title');
-                    const modalEditTitleLabel = document.getElementById('title-edit-label');
-                    const modalEditOpeningHrLabel = document.getElementById('opening-hr-edit-label');
-                    const modalEditClosingHrLabel = document.getElementById('closing-hr-edit-label');
-                    const modalEditDescLabel = document.getElementById('desc-edit-label');
-                    const modalEditMapLabel = document.getElementById('modal-map-edit-label');
-                    
-                    const editBtnsDiv = document.getElementById('edit-btns');
-                    const submitBtn = document.getElementById('submit-edit-button');
-                    const cancelbtn = document.getElementById('cancel-button');
-
                     // edit marker position
                     let editMarker = modalMapMarker;
 
@@ -287,7 +317,7 @@ const openModal = (modalType, data) => {
                         modalEditOpeningHrLabel.style.display = 'block';
                         modalEditClosingHrLabel.style.display = 'block';
                         modalEditDescLabel.style.display = 'block';
-                        modalEditMapLabel.style.display = 'block';
+                        modalEditMapLabel.style.visibility = 'visible';
                         editDeleteBtnsDiv.style.display = 'none';
 
                         // show buttons suitable for edit mode
@@ -346,7 +376,7 @@ const openModal = (modalType, data) => {
                                 modalEditOpeningHrLabel.style.display = 'none';
                                 modalEditClosingHrLabel.style.display = 'none';
                                 modalEditDescLabel.style.display = 'none';
-                                modalEditMapLabel.style.display = 'none';
+                                modalEditMapLabel.style.visibility = 'hidden';
 
                                 // show again all the normal modal elements
                                 title.style.display = 'block';
@@ -376,7 +406,7 @@ const openModal = (modalType, data) => {
                         modalEditOpeningHrLabel.style.display = 'none';
                         modalEditClosingHrLabel.style.display = 'none';
                         modalEditDescLabel.style.display = 'none';
-                        modalEditMapLabel.style.display = 'none';
+                        modalEditMapLabel.style.visibility = 'hidden';
 
                         // show again all the normal modal elements
                         title.style.display = 'block';
@@ -509,11 +539,19 @@ const openModal = (modalType, data) => {
         // set modal-content-about display from none to block
         aboutContent.style.display = 'block';
     } else if (modalType = 'create') {
-        createSpotContent.style.display = 'block';
+        createSpotContent.style.display = 'flex';
 
         modalMap = new google.maps.Map(
             document.getElementById('modal-create-map'),
-            { zoom: 11, center: hel }
+            {
+                zoom: 11,
+                center: hel,
+                streetViewControl: false,
+                rotateControl: false,
+                fullscreenControl: false,
+                zoomControl: true,
+                mapTypeControl: false,
+            }
         );
 
         modalMap.addListener('click', event => {
@@ -604,6 +642,27 @@ const closeModal = () => {
     aboutContent.style.display = 'none';
     createSpotContent.style.display = 'none';
     editDeleteBtnsDiv.style.display = 'none';
+
+    // this stuff makes sure edit window always gets hidden when exited
+    titleEditInput.style.display = 'none';
+    descriptionEditInput.style.display = 'none';
+    editDeleteBtnsDiv.style.display = 'block';
+    editDeleteBtnsDiv.style['align-self'] = 'fles-end';
+    editBtnsDiv.style.display = 'none';
+    openingHrInput.style.display = 'none';
+    closingHrInput.style.display = 'none';
+    modalEditTitle.style.display = 'none';
+    modalEditTitleLabel.style.display = 'none';
+    modalEditOpeningHrLabel.style.display = 'none';
+    modalEditClosingHrLabel.style.display = 'none';
+    modalEditDescLabel.style.display = 'none';
+    modalEditMapLabel.style.visibility = 'hidden';
+    title.style.display = 'block';
+    desc.style.display = 'block';
+    creatorWrapper.style.display = 'block';
+    openingHrWrapper.style.display = 'block';
+    closingHrWrapper.style.display = 'block';
+    
 }
 
 /**
