@@ -3,6 +3,7 @@
 ## Prerequisites
 
 Have following installed on your machine with your favorite package manager to start developing
+*[PHP](https://www.php.net/)
 * [Composer](https://getcomposer.org/)
 * [Node.js](https://nodejs.org/)
 * [NPM](https://www.npmjs.com/)
