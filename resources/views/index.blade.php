@@ -131,7 +131,7 @@
             <!-- About modal -->
             <div id="modal-content-about" class="modal-content shadow">
                 <button class="close-modal">x</button>
-                <h2 id="modal-title">About SK8-SPOTS</h2>
+                <h2 id="modal-title" class="about-modal-title">About SK8-SPOTS</h2>
                 <p id="modal-desc">
                     SK8-SPOTS is a web app where skaters can share their favourite skateboarding spots and mark them on a map. <br>
                     Everyone can browse the map for cool new spots and registered users can share new spots and give them a small description. <br>

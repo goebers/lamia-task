@@ -176,6 +176,10 @@ span {
     background-color: rgba(0,0,0,0.4);
 }
 
+.about-modal-title {
+    margin: 10px 0;
+}
+
 #modal-content-spot, #modal-content-register, #modal-content-login,
 #modal-content-about, #modal-content-create, #delete-edit-btns,
 #edit-btns, #modal-edit-title {
@@ -198,17 +202,8 @@ span {
 }
 #modal-content-login, #modal-content-about, #modal-content-register {
     height: 60%;
-    width: 40vh;
+    width: 60vh;
     font-family: 'Roboto';
-
-    @media screen and (max-width: $break-large) {
-        width: 60vh;
-    }
-
-    @media screen and (max-width: $break-small) {
-        width: 80vh;
-    }
-
 }
 
 .close-modal {
@@ -237,7 +232,6 @@ span {
     display: flex;
     flex-direction: row;
     justify-content: space-around;
-    width: 100%;
 
     @media screen and (max-width: $break-small) {
         display: block !important;
